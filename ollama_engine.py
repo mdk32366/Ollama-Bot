@@ -143,7 +143,7 @@ class OllamaChatEngine:
 
     def __init__(self, model_name: str = "qwen2.5-coder:latest"):
         # Load config.json
-        config_path = os.path.join(os.path.dirname(__file__), "configs-copy.json")
+        config_path = os.path.join(os.path.dirname(__file__), "configs.json")
         print(config_path)
         if os.path.exists(config_path):
             with open(config_path, "r") as f:
@@ -394,14 +394,14 @@ class OllamaChatEngine:
         if answer_text.startswith("data:image"):
             image_base64 = answer_text
             answer_text = "(Image generated below)"
-
-        self.history.append({"role": "user", "content": prompt})
+        #GA: added in tool_calls here to fix bug.
+        self.history.append({"role": "assistant", "content": prompt})
         assistant_text = answer_text
 
         if tool_calls:
             assistant_text += "\n\n### Tools used:\n" + "\n".join(f"- `{t}`" for t in tool_calls)
 
-        self.history.append({"role": "assistant", "content": assistant_text})
+        self.history.append({"role": "assistant", "content": assistant_text,"tools": tool_calls})
 
         return {
             "text": answer_text,
